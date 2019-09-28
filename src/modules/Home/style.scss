@@ -1,0 +1,65 @@
+@import 'styles/variables.scss';
+@import 'styles/mixins.scss';
+
+.main-container {
+  height: 100vh;
+  position: relative;
+}
+
+.homepage {
+  @include flexRow;
+  justify-content: center;
+
+  &-main {
+    @include flexCol;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &-image {
+    width: 276px;
+  }
+
+  &-title {
+    color: #d5d5d5;
+    font-size: 91px;
+    text-align: center;
+    font-family: "Star Avenue";
+  }
+
+  &-footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding: 40px 0;
+    text-align: center;
+
+    &__contact {
+      color: $color-white;
+
+      &:hover {
+        color: $color-white;
+        text-decoration: none;
+      }
+    }
+
+    &__slash {
+      padding: 0 30px;
+    }
+
+    &__client:hover {
+      cursor: pointer;
+    }
+  }
+}
+
+.modal-dialog {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) !important;
+}
+
+.modal-open .modal {
+  background: $color-black;
+}

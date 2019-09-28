@@ -1,0 +1,53 @@
+@import 'styles/variables.scss';
+@import 'styles/mixins.scss';
+
+.videopage {
+
+  &-main {
+
+    &__featured {
+      @include flexRow;
+      justify-content: center;
+      margin-bottom: 40px;
+    }
+
+    &__event {
+      @include flexRow;
+    }
+
+    &__text {
+      width: 170px;
+      text-align: right;
+    }
+
+    &__devider {
+      width: 100%;
+      height: 1px;
+      display: inline-block;
+      margin-left: 15px;
+      background: $color-white;
+    }
+
+    &__videos {
+      padding-left: 170px;
+      height: 164px;
+
+      & .slick-next {
+        right: -5px;
+      }
+
+      .loader-hide,
+      .video-hide {
+        display: none !important;
+      }
+
+      .loader-show {
+        display: flex;
+      }
+
+      .video-show {
+        display: block;
+      }
+    }
+  }
+}
