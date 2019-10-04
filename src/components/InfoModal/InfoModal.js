@@ -20,7 +20,7 @@ class InfoModal extends Component {
 
   onClickOK = () => {
     const { accessCode } = this.state;
-    if (accessCode === '123') {
+    if (accessCode === process.env.REACT_APP_ACCESS_CODE) {
       history.push('/video');
     }
     this.props.onClick();

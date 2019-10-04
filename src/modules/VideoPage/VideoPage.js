@@ -13,14 +13,16 @@ class VideoPage extends Component {
     this.state = {
       videos: [],
       isVideoLoaded: false,
+      isVideoPlay: false,
+      hoveredVideoUri: null,
       isVideoError: false
     };
   }
 
   componentDidMount() {
     axios
-      .get('https://api.vimeo.com/users/19850221/videos', {
-        headers: { Authorization: 'Bearer f3b57b7288bdb41eb56e3d33bceb1a97' }
+      .get(process.env.REACT_APP_VIMEO_SERVER, {
+        headers: { Authorization: `Bearer ${process.env.REACT_APP_USER_TOKEN}` }
       })
       .then(res => {
         this.setState({ videos: res.data.data });
@@ -32,8 +34,24 @@ class VideoPage extends Component {
     if (index === lastIdx) this.setState({ isVideoLoaded: true });
   };
 
+  onPlay = () => {
+    this.setState({ isVideoPlay: true });
+  };
+
+  onPause = () => {
+    this.setState({ isVideoPlay: false });
+  };
+
   onError = error => {
     this.setState({ isVideoError: true });
+  };
+
+  onMouseOverImage = uri => () => {
+    this.setState({ hoveredVideoUri: uri });
+  };
+
+  onMouseOutImage = index => () => {
+    this.setState({ hoveredVideoUri: null });
   };
 
   render() {
@@ -43,36 +61,90 @@ class VideoPage extends Component {
       slidesToScroll: 4
     };
 
-    const { videos, isVideoLoaded } = this.state;
-    console.log('videos', videos);
+    const mobileSettings = {
+      speed: 500,
+      slidesToShow: 1,
+      slidesToScroll: 1
+    };
+
+    const { videos, isVideoLoaded, isVideoPlay, hoveredVideoUri } = this.state;
 
     return (
       <Container className="main-container videopage">
         <div className="videopage-main">
           <div className="videopage-main__featured">
-            <ReactPlayer url="https://vimeo.com/90509568" controls />
+            <ReactPlayer
+              url="https://vimeo.com/90509568"
+              width="100%"
+              className="videopage-main__featuredvideo"
+              controls
+            />
           </div>
           <div className="videopage-main__event">
             <div className="videopage-main__text">BRANDED EVENTS</div>
             <div className="videopage-main__devider"></div>
           </div>
           <div className="videopage-main__videos">
-            <VideoLoader className={`${isVideoLoaded ? 'loader-hide' : 'loader-show'}`} />
-            <Slider {...settings} className={`${isVideoLoaded ? 'video-show' : 'video-hide'}`}>
-              {videos.map((item, index) => {
-                return (
-                  <ReactPlayer
-                    key={`item_${index}`}
-                    url={item.link}
-                    width="90%"
-                    height="164px"
-                    controls
-                    onReady={this.onReady(index)}
-                    onError={this.onError}
-                  />
-                );
-              })}
-            </Slider>
+            {<VideoLoader className={`${isVideoLoaded ? 'loader-hide' : 'loader-show'}`} />}
+            <div className="videopage-main__desktopSlider">
+              <Slider {...settings} className={`${isVideoLoaded ? 'slider-show' : 'slider-hide'}`}>
+                {videos.map((item, index) => {
+                  return (
+                    <div key={`item_${index}`}>
+                      <ReactPlayer
+                        url={item.link}
+                        width="90%"
+                        height="164px"
+                        controls
+                        onReady={this.onReady(index)}
+                        onPlay={this.onPlay}
+                        onPause={this.onPause}
+                        onError={this.onError}
+                        // playing={isVideoPlay && hoveredVideoUri === item.uri && true}
+                        playing={isVideoPlay && hoveredVideoUri === item.uri}
+                        className={`${hoveredVideoUri === item.uri ? 'video-show' : 'video-hide'}`}
+                      />
+                      <div
+                        className={`videopage-main__videos-thumb ${
+                          hoveredVideoUri === item.uri ? 'video-hide' : 'video-show'
+                        }`}
+                        onMouseOver={this.onMouseOverImage(item.uri)}
+                        // onMouseOut={this.onMouseOutImage(index)}
+                      >
+                        <img src={item.pictures.sizes[2].link} width="90%" alt="video" />
+                        <div className="videopage-main__videos-playbutton">
+                          <div className="videopage-main__videos-triangle" />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </Slider>
+            </div>
+            <div className="videopage-main__mobileSlider">
+              <Slider
+                {...mobileSettings}
+                className={`${isVideoLoaded ? 'slider-show' : 'slider-hide'}`}
+              >
+                {videos.map((item, index) => {
+                  return (
+                    <div key={`item_${index}`}>
+                      <ReactPlayer
+                        url={item.link}
+                        width="100%"
+                        height="164px"
+                        controls
+                        onReady={this.onReady(index)}
+                        onPlay={this.onPlay}
+                        onPause={this.onPause}
+                        onError={this.onError}
+                        playing={isVideoPlay && hoveredVideoUri === item.uri}
+                      />
+                    </div>
+                  );
+                })}
+              </Slider>
+            </div>
           </div>
 
           <div className="videopage-main__event">
@@ -80,22 +152,66 @@ class VideoPage extends Component {
             <div className="videopage-main__devider"></div>
           </div>
           <div className="videopage-main__videos">
-            <VideoLoader className={`${isVideoLoaded ? 'loader-hide' : 'loader-show'}`} />
-            <Slider {...settings} className={`${isVideoLoaded ? 'video-show' : 'video-hide'}`}>
-              {videos.map((item, index) => {
-                return (
-                  <ReactPlayer
-                    key={`item_${index}`}
-                    url={item.link}
-                    width="90%"
-                    height="164px"
-                    controls
-                    onReady={this.onReady}
-                    onError={this.onError}
-                  />
-                );
-              })}
-            </Slider>
+            {<VideoLoader className={`${isVideoLoaded ? 'loader-hide' : 'loader-show'}`} />}
+            <div className="videopage-main__desktopSlider">
+              <Slider {...settings} className={`${isVideoLoaded ? 'slider-show' : 'slider-hide'}`}>
+                {videos.map((item, index) => {
+                  return (
+                    <div key={`item_${index}`}>
+                      <ReactPlayer
+                        url={item.link}
+                        width="90%"
+                        height="164px"
+                        controls
+                        onReady={this.onReady(index)}
+                        onPlay={this.onPlay}
+                        onPause={this.onPause}
+                        onError={this.onError}
+                        // playing={isVideoPlay && hoveredVideoUri === item.uri && true}
+                        playing={isVideoPlay && hoveredVideoUri === item.uri}
+                        className={`${hoveredVideoUri === item.uri ? 'video-show' : 'video-hide'}`}
+                      />
+                      <div
+                        className={`videopage-main__videos-thumb ${
+                          hoveredVideoUri === item.uri ? 'video-hide' : 'video-show'
+                        }`}
+                        onMouseOver={this.onMouseOverImage(item.uri)}
+                        // onMouseOut={this.onMouseOutImage(index)}
+                      >
+                        <img src={item.pictures.sizes[2].link} width="90%" alt="video" />
+                        <div className="videopage-main__videos-playbutton">
+                          <div className="videopage-main__videos-triangle" />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </Slider>
+            </div>
+            <div className="videopage-main__mobileSlider">
+              <Slider
+                {...mobileSettings}
+                className={`${isVideoLoaded ? 'slider-show' : 'slider-hide'}`}
+              >
+                {videos.map((item, index) => {
+                  return (
+                    <div key={`item_${index}`}>
+                      <ReactPlayer
+                        url={item.link}
+                        width="100%"
+                        height="164px"
+                        controls
+                        onReady={this.onReady(index)}
+                        onPlay={this.onPlay}
+                        onPause={this.onPause}
+                        onError={this.onError}
+                        playing={isVideoPlay && hoveredVideoUri === item.uri}
+                      />
+                    </div>
+                  );
+                })}
+              </Slider>
+            </div>
           </div>
         </div>
       </Container>
